@@ -8,7 +8,7 @@ namespace Attendance.Infrastructure.Repositories;
 
 public class EmployeeShiftRepository(ApplicationDbContext _context) : IEmployeeShiftRepository
 {
-    public async Task AssignShiftAsync(int employeeId, int shiftId, DateTime assignedDate)
+    public async Task AssignEmployeeShiftAsync(int employeeId, int shiftId, DateTime assignedDate)
     {
         var employeeShift = new EmployeeShift
         {
@@ -20,7 +20,7 @@ public class EmployeeShiftRepository(ApplicationDbContext _context) : IEmployeeS
         await _context.SaveChangesAsync();
     }
 
-    public async Task UnassignShiftAsync(int employeeShiftId)
+    public async Task UnassignEmployeeShiftAsync(int employeeShiftId)
     {
         var assignedShift = await _context.EmployeeShifts.FindAsync(employeeShiftId);
         if (assignedShift != null)
@@ -38,7 +38,7 @@ public class EmployeeShiftRepository(ApplicationDbContext _context) : IEmployeeS
                                             .FirstOrDefaultAsync(es => es.Id == employeeShiftId);
     }
 
-    public async Task<IEnumerable<EmployeeShift>> GetShiftsForEmployeeAsync(int employeeId)
+    public async Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsAsync(int employeeId)
     {
        return await _context.EmployeeShifts.Include(es => es.Employee)
                                             .Include(es => es.Shift)
@@ -48,7 +48,7 @@ public class EmployeeShiftRepository(ApplicationDbContext _context) : IEmployeeS
     }
 
     // Get all shifts for an employee on a specific date
-    public async Task<IEnumerable<EmployeeShift>> GetByEmployeeIdAndDateAsync(int employeeId, DateTime date)
+    public async Task<IEnumerable<EmployeeShift>> GetEmployeeShiftsByEmployeeIdAndDateAsync(int employeeId, DateTime date)
     {
         var localDate = date.Date;
         return await _context.EmployeeShifts.Include(es => es.Shift)
@@ -58,7 +58,7 @@ public class EmployeeShiftRepository(ApplicationDbContext _context) : IEmployeeS
     }
 
     // Get all employees assigned to any shift on a specific date
-    public async Task<IEnumerable<EmployeeShift>> GetByDateAsync(DateTime date)
+    public async Task<IEnumerable<EmployeeShift>> GetEmployeeShifsByDateAsync(DateTime date)
     {
         var localDate = date.Date;
         return await _context.EmployeeShifts .Include(es => es.Employee)

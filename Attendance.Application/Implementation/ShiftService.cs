@@ -18,13 +18,13 @@ public class ShiftService : IShiftService
         _logger = logger ?? throw new ArgumentException(nameof(ILogger<ShiftService>));
     }
     
-    public async Task<GenericResponse<string>> CreateShiftAsync(CreateShiftDto shift)
+    public async Task<GenericResponse<string>> CreateShiftAsync(CreateShiftDto shift, CancellationToken ct = default)
     {
         _logger.LogInformation($"==============Inside {nameof(CreateShiftAsync)}==============");
         
         _logger.LogInformation("Attempting to create shift with name: {ShiftName}", shift.Name);
         
-        var ShiftName = shift.Name?.Trim();
+        var shiftName = shift.Name.Trim();
         
         if (string.IsNullOrWhiteSpace(shift.Name))
         {
@@ -33,11 +33,11 @@ public class ShiftService : IShiftService
             return GenericResponse<string>.BadRequest("Shift name cannot be empty.");
         }
         
-        var existingShift = await _shiftRepository.GetShiftByNameAsync(shift.Name.Trim());
+        var existingShift = await _shiftRepository.GetShiftByNameAsync(shift.Name.Trim(), ct);
         if (existingShift != null)
         {
             _logger.LogWarning("Shift with name {ShiftName} already exists.", shift.Name);
-            return GenericResponse<string>.Duplicate($"Shift with name {ShiftName} already exists.");
+            return GenericResponse<string>.Duplicate($"Shift with name {shiftName} already exists.");
         }
         var newShift = new Shift
         {
@@ -47,20 +47,20 @@ public class ShiftService : IShiftService
             GracePeriodMinutes = shift.GracePeriodMinutes
         };
         
-         await _shiftRepository.CreateShiftAsync(newShift);
+         await _shiftRepository.CreateShiftAsync(newShift, ct);
          
         _logger.LogInformation("Successfully created shift with name: {ShiftName}", shift.Name);
         
         return GenericResponse<string>.Success("Shift created successfully.", null ,"201");
     }
 
-    public async Task<GenericResponse<ShiftDto>> GetShiftByIdAsync(int shiftId)
+    public async Task<GenericResponse<ShiftDto>> GetShiftByIdAsync(int shiftId, CancellationToken ct = default)
     {
         _logger.LogInformation($"==============Inside {nameof(GetShiftByIdAsync)} with ShiftId: {shiftId}==============");
         
         _logger.LogInformation("Attempting to retrieve shift with id: {ShiftId}", shiftId);
         
-        var shift = await _shiftRepository.GetShiftByIdAsync(shiftId);
+        var shift = await _shiftRepository.GetShiftByIdAsync(shiftId, ct);
         if (shift == null)
         {
             _logger.LogWarning("Shift with ID: {ShiftId} not found", shiftId);
@@ -81,13 +81,13 @@ public class ShiftService : IShiftService
         return GenericResponse<ShiftDto>.Success("Shift retrieved successfully", shiftDto, "200");
     }
 
-    public async Task<GenericResponse<IEnumerable<ShiftDto>>> GetAllShiftsAsync()
+    public async Task<GenericResponse<IEnumerable<ShiftDto>>> GetAllShiftsAsync(CancellationToken ct = default)
     {
         _logger.LogInformation($"==============Inside {nameof(GetAllShiftsAsync)}==============");
         
         _logger.LogInformation($"Attempting to retrieve all shifts");
         
-        var shifts = await _shiftRepository.GetAllShiftsAsync();
+        var shifts = await _shiftRepository.GetAllShiftsAsync(ct);
         if (shifts == null || !shifts.Any())
         {
             _logger.LogWarning("No shifts found in the system.");
@@ -109,13 +109,13 @@ public class ShiftService : IShiftService
         
     }
 
-    public async Task<GenericResponse<ShiftDto>> GetShiftByNameAsync(string shiftName)
+    public async Task<GenericResponse<ShiftDto>> GetShiftByNameAsync(string shiftName, CancellationToken ct = default)
     {
         _logger.LogInformation($"==============Inside {nameof(GetShiftByNameAsync)}==============");
 
         _logger.LogInformation("Attempting to retrieve shift with shift name {shiftName}", shiftName);
         
-        var shift = await _shiftRepository.GetShiftByNameAsync(shiftName);
+        var shift = await _shiftRepository.GetShiftByNameAsync(shiftName, ct);
         if (shift == null)
         {
             _logger.LogWarning("Shift with name {ShiftName} not found", shiftName);
@@ -136,13 +136,13 @@ public class ShiftService : IShiftService
         return GenericResponse<ShiftDto>.Success("Shift retrieved successfully", shiftDto, "200");
     }
 
-    public async Task<GenericResponse<string>> UpdateShiftAsync(UpdateShiftDto shift)
+    public async Task<GenericResponse<string>> UpdateShiftAsync(UpdateShiftDto shift, CancellationToken ct = default)
     {
         _logger.LogInformation($"==============Inside {nameof(UpdateShiftAsync)}==============");
         
         _logger.LogInformation("Attempting to update shift with ID: {ShiftId}", shift.Id);
         
-        var existingShift = await _shiftRepository.GetShiftByIdAsync(shift.Id);
+        var existingShift = await _shiftRepository.GetShiftByIdAsync(shift.Id, ct);
         if (existingShift == null)
         {
             _logger.LogWarning("Shift with ID: {ShiftId} not found", shift.Id);
@@ -154,47 +154,47 @@ public class ShiftService : IShiftService
         existingShift.EndTime = shift.EndTime;
         existingShift.GracePeriodMinutes = shift.GracePeriodMinutes;    
         
-        await _shiftRepository.UpdateShiftAsync(existingShift);
+        await _shiftRepository.UpdateShiftAsync(existingShift, ct);
         
         _logger.LogInformation("Successfully updated shift {@updatedShift}", existingShift);
         
         return GenericResponse<string>.Success("Shift updated successfully", null, "200");
     }
 
-    public async Task<GenericResponse<string>> DeleteShiftAsync(int shiftId)
+    public async Task<GenericResponse<string>> DeleteShiftAsync(int shiftId, CancellationToken ct = default)
     {
         _logger.LogInformation($"==============Inside {nameof(DeleteShiftAsync)}==============");
         
         _logger.LogInformation("Attempting to delete shift with ID: {ShiftId}", shiftId);
         
-        var existingShift = await _shiftRepository.GetShiftByIdAsync(shiftId);
+        var existingShift = await _shiftRepository.GetShiftByIdAsync(shiftId, ct);
         if (existingShift == null)
         {
             _logger.LogWarning("Shift with ID: {ShiftId} not found", shiftId);
             return GenericResponse<string>.NotFound("Shift not found");
         }
         
-        await _shiftRepository.DeleteShiftAsync(shiftId);
+        await _shiftRepository.DeleteShiftAsync(shiftId, ct);
         
         _logger.LogInformation("Successfully deleted shift with ID: {ShiftId}", shiftId);
         
         return GenericResponse<string>.Success("Shift deleted successfully", $"Shift with ID {shiftId} deleted.", "200");
     }
 
-    public async Task<GenericResponse<bool>> IsTimeWithinShiftAsync(int shiftId, TimeSpan time)
+    public async Task<GenericResponse<bool>> IsTimeWithinShiftAsync(int shiftId, TimeSpan time, CancellationToken ct = default)
     {
         _logger.LogInformation($"==============Inside {nameof(IsTimeWithinShiftAsync)}==============");
         
         _logger.LogInformation("Checking if time {Time} is within shift ID: {ShiftId}", time, shiftId);
         
-        var shiftExists = await _shiftRepository.ShiftExistsAsync(shiftId);
+        var shiftExists = await _shiftRepository.ShiftExistsAsync(shiftId, ct);
         if (!shiftExists)
         {
             _logger.LogWarning("Shift with ID: {ShiftId} not found", shiftId);
             return GenericResponse<bool>.NotFound("Shift not found");
         }
         
-        var isWithinShift = await _shiftRepository.IsTimeWithinShiftAsync(shiftId, time);
+        var isWithinShift = await _shiftRepository.IsTimeWithinShiftAsync(shiftId, time, ct);
         
         _logger.LogInformation("Time {Time} is within shift ID {ShiftId}: {IsWithinShift}", time, shiftId, isWithinShift);
         

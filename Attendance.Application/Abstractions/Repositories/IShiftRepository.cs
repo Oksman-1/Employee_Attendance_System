@@ -4,12 +4,12 @@ namespace Attendance.Application.Abstractions.Repositories;
 
 public interface IShiftRepository
 {
-    Task<Shift> CreateShiftAsync(Shift shift);
-    Task<Shift?> GetShiftByIdAsync(int shiftId);
-    Task<IEnumerable<Shift>> GetAllShiftsAsync();
-    Task<Shift?> GetShiftByNameAsync(string shiftName);
-    Task UpdateShiftAsync(Shift shift);
-    Task DeleteShiftAsync(int shiftId);
-    Task<bool> ShiftExistsAsync(int shiftId);
-    Task<bool> IsTimeWithinShiftAsync(int shiftId, TimeSpan time);
+    Task<Shift> CreateShiftAsync(Shift shift, CancellationToken ct = default);
+    Task<Shift?> GetShiftByIdAsync(int shiftId, CancellationToken ct = default);
+    Task<IEnumerable<Shift>> GetAllShiftsAsync(CancellationToken ct = default);
+    Task<Shift?> GetShiftByNameAsync(string shiftName, CancellationToken ct = default);
+    Task UpdateShiftAsync(Shift shift, CancellationToken ct = default);
+    Task DeleteShiftAsync(int shiftId, CancellationToken ct = default);
+    Task<bool> ShiftExistsAsync(int shiftId, CancellationToken ct = default);
+    Task<bool> IsTimeWithinShiftAsync(int shiftId, TimeSpan time, CancellationToken ct = default);
 }
