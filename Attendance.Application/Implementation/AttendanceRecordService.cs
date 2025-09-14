@@ -15,7 +15,7 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
 
 
     public async Task<GenericResponse<string>> CreateAttendanceRecordAsync(CreateAttendanceRecordDto createAttendanceRecordDto, CancellationToken ct = default)
-  {
+   {
         _logger.LogInformation($"==============Inside {nameof(CreateAttendanceRecordAsync)}==============");
 
         _logger.LogInformation("Creating attendance record for EmployeeId {EmployeeId} on {Date}", createAttendanceRecordDto.EmployeeId, createAttendanceRecordDto.AttendanceDate);
@@ -45,10 +45,10 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
         _logger.LogInformation("Attendance record created successfully for EmployeeId {EmployeeId} on {Date}", createAttendanceRecordDto.EmployeeId, createAttendanceRecordDto.AttendanceDate);
 
         return GenericResponse<string>.Success("Attendance record created successfully.", null, "201");  
-  }
+    }
 
   public async Task<GenericResponse<string>> UpdateAttendanceRecordAsync(UpdateAttendanceRecordDto updateAttendanceRecordDto, CancellationToken ct = default)
-  {
+    {
         _logger.LogInformation($"==============Inside {nameof(UpdateAttendanceRecordAsync)}==============");
 
         _logger.LogInformation("Updating attendance record with Id {Id}", updateAttendanceRecordDto.Id);
@@ -85,10 +85,10 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
 
         return GenericResponse<string>.Success("Attendance record updated successfully.", null, "200"); 
 
-  }
+    }
 
   public async Task<GenericResponse<AttendanceRecordDto>> GetEmployeeAttendanceByDateAsync(int employeeId, DateOnly date, CancellationToken ct = default)
-  {
+    {
         _logger.LogInformation($"==============Inside {nameof(GetEmployeeAttendanceByDateAsync)}==============");
 
         _logger.LogInformation("Fetching attendance record for EmployeeId {EmployeeId} on {Date}", employeeId, date);
@@ -120,10 +120,10 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
 
         return GenericResponse<AttendanceRecordDto>.Success("Attendance record retrieved successfully.", attendanceRecordDto, "200");
 
-  }
+    }
 
   public async Task<GenericResponse<IEnumerable<AttendanceRecordDto>>> GetAttendanceRecordsByDateRangeAsync(DateOnly start, DateOnly end, CancellationToken ct = default)
-  {
+   {
         _logger.LogInformation($"==============Inside {nameof(GetAttendanceRecordsByDateRangeAsync)}==============");
 
         _logger.LogInformation("Fetching attendance records between {Start} to {End}", start, end);
@@ -154,7 +154,7 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
 
         return GenericResponse<IEnumerable<AttendanceRecordDto>>.Success("Attendance records retrieved successfully.", attendanceRecordDtos, "200");
 
-  }
+    }
 
 
 //    private static AttendanceRecordDto ToDto(AttendanceRecord record) =>

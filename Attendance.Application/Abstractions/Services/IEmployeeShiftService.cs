@@ -10,7 +10,7 @@ public interface IEmployeeShiftService
     Task<GenericResponse<EmployeeShiftDto>> GetEmployeeShiftAsync(int employeeShiftId, CancellationToken ct = default);
     Task<GenericResponse<IEnumerable<EmployeeShiftDto>>> GetEmployeeShiftsAsync(int employeeId, CancellationToken ct = default);
     Task<GenericResponse<IEnumerable<EmployeeShiftDto>>> GetEmployeeShiftsByEmployeeIdAndDateAsync(int employeeId, DateTime date,CancellationToken ct = default);
-    Task<GenericResponse<IEnumerable<EmployeeShiftDto>>> GetEmployeeShifsByDateAsync(DateTime date, CancellationToken ct = default);
-    Task<bool> IsEmployeeOnShiftAsync(int employeeId, DateTime date, CancellationToken ct = default);
-    Task<string> DeleteEmployeeShiftAsync(int employeeShiftId, CancellationToken ct = default);
+    Task<GenericResponse<IEnumerable<EmployeeShiftDto>>> GetEmployeeShiftsByDateAsync(DateTime date, CancellationToken ct = default);
+    Task<GenericResponse<bool>> IsEmployeeOnShiftAsync(int employeeId, DateTime date, CancellationToken ct = default);
+    Task<GenericResponse<string>> DeleteEmployeeShiftAsync(int employeeShiftId, CancellationToken ct = default);
 }
