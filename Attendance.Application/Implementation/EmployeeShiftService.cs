@@ -75,12 +75,12 @@ public class EmployeeShiftService : IEmployeeShiftService
       }
      
       var employeeShiftDto = new EmployeeShiftDto(
-            employeeShift.Id,
-            employeeShift.EmployeeId,
-            employeeShift.Employee?.FullName ?? string.Empty,
-            employeeShift.ShiftId,
-             employeeShift.Shift?.Name ?? string.Empty,
-            employeeShift.AssignedDate
+            Id : employeeShift.Id,
+            EmployeeId : employeeShift.EmployeeId,
+            EmployeeName : employeeShift.Employee?.FullName ?? string.Empty,
+            ShiftId : employeeShift.ShiftId,
+            ShiftName : employeeShift.Shift?.Name ?? string.Empty,
+            AssignedDate : employeeShift.AssignedDate
         );
 
       _logger.LogInformation("Successfully retrieved shift with EmployeeShiftId: {EmployeeShiftId}", employeeShiftId);
@@ -104,12 +104,12 @@ public class EmployeeShiftService : IEmployeeShiftService
         }
 
         var employeeShiftDtos = employeeShifts.Select(es => new EmployeeShiftDto(
-              es.Id,
-              es.EmployeeId,
-              es.Employee?.FullName ?? string.Empty,
-              es.ShiftId,
-              es.Shift?.Name ?? string.Empty,
-              es.AssignedDate
+              Id : es.Id,
+              EmployeeId : es.EmployeeId,
+              EmployeeName : es.Employee?.FullName ?? string.Empty,
+              ShiftId : es.ShiftId,
+              ShiftName : es.Shift?.Name ?? string.Empty,
+              AssignedDate : es.AssignedDate
           )).ToList();
 
         _logger.LogInformation("Successfully retrieved {Count} shifts for employee with ID: {EmployeeId}", employeeShiftDtos.Count, employeeId);
