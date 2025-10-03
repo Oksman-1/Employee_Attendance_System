@@ -120,14 +120,14 @@ public class LeaveRecordService : ILeaveRecordService
           
           _logger.LogInformation("LeaveRecord with Id {Id} retrieved successfully", leaveRecordId);
           
-          return  GenericResponse<LeaveRecordDto>.Success("Leave record deleted successfully", leaveRecordToReturn, "200");
+          return  GenericResponse<LeaveRecordDto>.Success("Leave record retrieved successfully", leaveRecordToReturn, "200");
       }
 
       public async Task<GenericResponse<IEnumerable<LeaveRecordDto>>> GetLeaveRecordsByEmployeeIdAsync(int employeeId, CancellationToken ct = default)
       {
           _logger.LogInformation("==============Inside {Method}==============", nameof(GetLeaveRecordsByEmployeeIdAsync));
 
-          _logger.LogInformation("About to retrieve leave records with employee Id: {Id}", employeeId);
+          _logger.LogInformation("About to retrieve leave records for employee with employee Id: {Id}", employeeId);
           
           var existingLeaveRecords = await _leaveRecordRepository.GetLeaveRecordsByEmployeeIdAsync(employeeId, ct);
           if (!existingLeaveRecords.Any())
@@ -136,29 +136,113 @@ public class LeaveRecordService : ILeaveRecordService
             
               return GenericResponse<IEnumerable<LeaveRecordDto>>.NotFound("Leave records not found");
           }
+
+          var leaveRecordsToReturn = existingLeaveRecords.Select(r => new LeaveRecordDto(
+             Id: r.Id,
+             EmployeeId: r.EmployeeId,
+             EmployeeName: r.Employee.FullName,
+             StartDate: r.StartDate,
+             EndDate: r.EndDate,
+             Reason: r.Reason,
+             Approved: r.Approved
+          ));
           
-        //  var leaveRecordsToReturn = new LeaveRecordDto()
-
-        throw new NotImplementedException();
+          return GenericResponse<IEnumerable<LeaveRecordDto>>.Success("Leave record retrieved successfully", leaveRecordsToReturn, "200");
       }
 
-      public async Task<GenericResponse<IEnumerable<LeaveRecordDto>>> GetLeaveRecordsByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken ct = default)
+      public async Task<GenericResponse<IEnumerable<LeaveRecordDto>>> GetLeaveRecordsByDateRangeAsync(
+          DateTime startDate, DateTime endDate, CancellationToken ct = default)
       {
-        throw new NotImplementedException();
+          _logger.LogInformation("==============Inside {Method}==============",
+              nameof(GetLeaveRecordsByDateRangeAsync));
+
+          _logger.LogInformation("About to retrieve leave records between {startDate} and {endDate}", startDate,
+              endDate);
+
+          var existingLeaveRecords =
+              await _leaveRecordRepository.GetLeaveRecordsByDateRangeAsync(startDate, endDate, ct);
+          if (!existingLeaveRecords.Any())
+          {
+              _logger.LogWarning("No existing leave record is found between {startDate} and {endDate}", startDate,
+                  endDate);
+              return GenericResponse<IEnumerable<LeaveRecordDto>>.NotFound("Leave records not found");
+          }
+
+          var leaveRecordsToReturn = existingLeaveRecords.Select(r => new LeaveRecordDto(
+              Id: r.Id,
+              EmployeeId: r.EmployeeId,
+              EmployeeName: r.Employee.FullName,
+              StartDate: r.StartDate,
+              EndDate: r.EndDate,
+              Reason: r.Reason,
+              Approved: r.Approved
+          ));
+
+          return GenericResponse<IEnumerable<LeaveRecordDto>>.Success("Leave record retrieved successfully", leaveRecordsToReturn, "200");  
       }
 
-      public Task<GenericResponse<bool>> HasOverlappingLeaveAsync(int employeeId, DateTime startDate, DateTime endDate, CancellationToken ct = default)
+      public async Task<GenericResponse<bool>> HasOverlappingLeaveAsync(int employeeId, DateTime startDate, DateTime endDate, CancellationToken ct = default)
       {
-        throw new NotImplementedException();
+          _logger.LogInformation("==============Inside {Method}==============", nameof(HasOverlappingLeaveAsync));
+          
+          _logger.LogInformation("About to check for overlapping leave records between {startDate} and {endDate} for employee with employeeId {employeeId}", startDate, endDate, employeeId);
+          
+          var isOverlapping =  await _leaveRecordRepository.HasOverlappingLeaveAsync(employeeId, startDate, endDate, ct);
+          
+          return GenericResponse<bool>.Success("Check completed successfully", isOverlapping, "200");
       }
 
-      public Task<GenericResponse<IEnumerable<LeaveRecordDto>>> GetPendingApprovalLeavesAsync(CancellationToken ct = default)
+      public async Task<GenericResponse<IEnumerable<LeaveRecordDto>>> GetPendingApprovalLeavesAsync(CancellationToken ct = default)
       {
-        throw new NotImplementedException();
+          _logger.LogInformation("==============Inside {Method}==============", nameof(GetPendingApprovalLeavesAsync));
+          
+          _logger.LogInformation("About to get pending approval leave records");
+          
+          var pendingLeaves = await _leaveRecordRepository.GetPendingApprovalLeavesAsync(ct);
+          if (!pendingLeaves.Any())
+          {
+                _logger.LogWarning("No pending approval leave records found");
+                
+                return GenericResponse<IEnumerable<LeaveRecordDto>>.NotFound("No pending approval leave records found");
+          }
+          
+          var leaveRecordsToReturn = pendingLeaves.Select(r => new LeaveRecordDto(
+               Id: r.Id,
+               EmployeeId: r.EmployeeId,
+               EmployeeName: r.Employee.FullName,
+               StartDate: r.StartDate,
+               EndDate: r.EndDate,
+               Reason: r.Reason,
+               Approved: r.Approved 
+          ));
+          
+          return GenericResponse<IEnumerable<LeaveRecordDto>>.Success("Pending approval leave records retrieved successfully", leaveRecordsToReturn, "200");
       }
 
-      public Task<GenericResponse<string>> ApproveLeaveAsync(int leaveRecordId, bool approved, CancellationToken ct = default)
+      public async Task<GenericResponse<string>> ApproveLeaveAsync(int leaveRecordId, bool approved, CancellationToken ct = default)
       {
-        throw new NotImplementedException();
+          _logger.LogInformation("==============Inside {Method}==============", nameof(ApproveLeaveAsync));
+          
+          _logger.LogInformation("About to approve leave for leave record with leave record Id: {Id}", leaveRecordId);
+          
+          var existingLeaveRecord = await _leaveRecordRepository.GetLeaveRecordByIdAsync(leaveRecordId, ct);
+          if (existingLeaveRecord is null)
+          {
+              _logger.LogWarning("LeaveRecord with Id {Id} not found", leaveRecordId);
+              return GenericResponse<string>.NotFound("Leave record not found");
+          }
+          
+          if (existingLeaveRecord.Approved == approved)
+          {
+                _logger.LogWarning("LeaveRecord with Id {Id} is already in the desired approval state", leaveRecordId);
+                return GenericResponse<string>.Duplicate("Leave record is already in the desired approval state");
+          }
+          
+          await _leaveRecordRepository.ApproveLeaveAsync(leaveRecordId, approved, ct);
+          
+          _logger.LogInformation("LeaveRecord with Id {Id} approval status updated successfully", leaveRecordId);
+        
+          return GenericResponse<string>.Success("Leave record approval status updated successfully", null, "200");
+          
       }
 }
