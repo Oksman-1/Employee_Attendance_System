@@ -1,10 +1,13 @@
 using Attendance.API.Extension;
+using Attendance.Domain.Common;
 using Attendance.Infrastructure;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Configure Serilog
+var configuration = builder.Configuration;
+
+//Configure Serilog 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("Logs/log--.txt", rollingInterval: RollingInterval.Day)
@@ -14,6 +17,13 @@ Log.Logger = new LoggerConfiguration()
 
 // Replaces default logging
 builder.Host.UseSerilog();
+
+// Bind and validate using DataAnnotations
+builder.Services.AddOptions<EmailSettings>()
+    .Bind(configuration.GetSection("Email"))
+    .ValidateDataAnnotations()
+    .Validate(settings => !string.IsNullOrWhiteSpace(settings.SmtpServer), "SmtpServer required")
+    .ValidateOnStart(); 
 
 // Add services to the container.
 builder.Services.AddControllers();

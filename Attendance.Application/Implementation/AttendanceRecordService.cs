@@ -104,16 +104,16 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
 
         var attendanceRecordDto = new AttendanceRecordDto
         (
-            employeeRecord.Id,
-            employeeRecord.EmployeeId,
-            employeeRecord.Employee?.FullName ?? string.Empty,
-            employeeRecord.AttendanceDate,
-            employeeRecord.ClockInAtUtc,
-            employeeRecord.ClockOutAtUtc,
-            employeeRecord.HoursWorked,
-            employeeRecord.CalculatedHoursWorked,
-            employeeRecord.IsLate,
-            employeeRecord.Notes
+            Id: employeeRecord.Id,
+            EmployeeId: employeeRecord.EmployeeId,
+            EmployeeName: employeeRecord.Employee?.FullName ?? string.Empty,
+            AttendanceDate: employeeRecord.AttendanceDate,
+            ClockInAtUtc: employeeRecord.ClockInAtUtc,
+            ClockOutAtUtc: employeeRecord.ClockOutAtUtc,
+            HoursWorked:employeeRecord.HoursWorked,
+            CalculatedHoursWorked:employeeRecord.CalculatedHoursWorked,
+            IsLate:employeeRecord.IsLate,
+            Notes:employeeRecord.Notes
         );
 
         _logger.LogInformation("Attendance record found for EmployeeId {EmployeeId} on {Date}", employeeId, date);

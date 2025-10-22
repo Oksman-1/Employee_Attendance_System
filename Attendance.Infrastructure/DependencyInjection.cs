@@ -21,7 +21,7 @@ public static class DependencyInjection
         
         //Add Services
          services.AddScoped<IEmployeeService, EmployeeService>();
-        // services.AddScoped<IEmailService, EmailService>();
+         services.AddScoped<IEmailService, EmailService>();
         // services.AddScoped<IReportingService, ReportingService>();
         
         // Register FluentValidation validators

@@ -243,6 +243,5 @@ public class LeaveRecordService : ILeaveRecordService
           _logger.LogInformation("LeaveRecord with Id {Id} approval status updated successfully", leaveRecordId);
         
           return GenericResponse<string>.Success("Leave record approval status updated successfully", null, "200");
-          
       }
 }
