@@ -10,15 +10,18 @@ public class CreateShiftDtoValidator : AbstractValidator<CreateShiftDto>
         // Validate Shift Name
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Shift name is required.")
-            .MaximumLength(50).WithMessage("Shift name cannot exceed 50 characters.");
+            .MaximumLength(50)
+            .WithMessage("Shift name cannot exceed 50 characters.");
 
         // Validate StartTime
         RuleFor(x => x.StartTime)
-            .NotNull().WithMessage("Start time is required.");
+            .NotNull()
+            .WithMessage("Start time is required.");
 
         // Validate EndTime
         RuleFor(x => x.EndTime)
-            .NotNull().WithMessage("End time is required.")
+            .NotNull()
+            .WithMessage("End time is required.")
             .GreaterThan(x => x.StartTime)
             .WithMessage("End time must be later than start time.");
 

@@ -5,7 +5,7 @@ namespace Attendance.Application.Abstractions.Services;
 
 public interface IAttendanceRecordService
 {
-   Task<GenericResponse<string>> CreateAttendanceRecordAsync(CreateAttendanceRecordDto createAttendanceRecordDto, CancellationToken ct = default);
+    Task<GenericResponse<string>> CreateAttendanceRecordAsync(CreateAttendanceRecordDto createAttendanceRecordDto, CancellationToken ct = default);
     
     Task<GenericResponse<string>> UpdateAttendanceRecordAsync(UpdateAttendanceRecordDto updateAttendanceRecordDto, CancellationToken ct = default);
 

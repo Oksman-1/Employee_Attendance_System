@@ -8,7 +8,8 @@ public class CreateLeaveRecordDtoValidator : AbstractValidator<CreateLeaveRecord
   public CreateLeaveRecordDtoValidator()
     {
         RuleFor(x => x.EmployeeId)
-            .GreaterThan(0).WithMessage("EmployeeId must be greater than 0.");
+            .GreaterThan(0)
+            .WithMessage("EmployeeId must be greater than 0.");
 
         RuleFor(x => x.StartDate)
             .LessThan(x => x.EndDate)
