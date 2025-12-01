@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Attendance.API.Extension;
 using Attendance.Domain.Common;
 using Attendance.Infrastructure;
@@ -26,23 +27,43 @@ builder.Services.AddOptions<EmailSettings>()
     .ValidateOnStart(); 
 
 // Add services to the container.
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+
 builder.Services.AddScoped<ValidationFilterAttribute>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Register Swagger generator
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Register Swagger
+builder.Services.AddSwaggerDocumentation();
 
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// if (app.Environment.IsDevelopment())
+// {
+//     app.MapOpenApi();
+//     //app.UseSwagger();
+//     //app.UseSwaggerUI();
+// }
+
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Dev" ||
+    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "uat")
 {
-    app.MapOpenApi();
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    
 }
 
 app.UseCors("CorsPolicy");
