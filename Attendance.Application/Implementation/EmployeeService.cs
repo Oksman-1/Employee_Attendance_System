@@ -37,15 +37,15 @@ public class EmployeeService : IEmployeeService
         }
 
         var employeeDto = new EmployeeDto(
-            employee.Id,
-            employee.EmployeeCode,
-            employee.FullName,
-            employee.Email,
-            employee.Department,
-            employee.JobTitle,
-            employee.HireDate,
-            employee.IsActive,
-            employee.CreatedAtUtc
+           Id : employee.Id,
+            EmployeeCode : employee.EmployeeCode,
+            FullName : employee.FullName,
+            Email : employee.Email,
+            Department : employee.Department,
+            JobTitle : employee.JobTitle,
+            HireDate : employee.HireDate,
+            IsActive : employee.IsActive,
+            CreatedAtUtc : employee.CreatedAtUtc
         );
 
         _logger.LogInformation("Successfully retrieved employee {@employee}", employee);
@@ -68,15 +68,15 @@ public class EmployeeService : IEmployeeService
         }
 
         var employeeDto = new EmployeeDto(
-            employee.Id,
-            employee.EmployeeCode,
-            employee.FullName,
-            employee.Email,
-            employee.Department,
-            employee.JobTitle,
-            employee.HireDate,
-            employee.IsActive,
-            employee.CreatedAtUtc
+            Id : employee.Id,
+            EmployeeCode : employee.EmployeeCode,
+            FullName : employee.FullName,
+            Email : employee.Email,
+            Department : employee.Department,
+            JobTitle : employee.JobTitle,
+            HireDate : employee.HireDate,
+            IsActive : employee.IsActive,
+            CreatedAtUtc : employee.CreatedAtUtc
         );
 
         _logger.LogInformation("Successfully retrieved employee {@employee}", employee);
@@ -100,15 +100,15 @@ public class EmployeeService : IEmployeeService
         }
 
         var employeeDtos = employees.Select(e => new EmployeeDto(
-            e.Id,
-            e.EmployeeCode,
-            e.FullName,
-            e.Email,
-            e.Department,
-            e.JobTitle,
-            e.HireDate,
-            e.IsActive,
-            e.CreatedAtUtc
+            Id : e.Id,
+            EmployeeCode : e.EmployeeCode,
+            FullName : e.FullName,
+            Email : e.Email,
+            Department : e.Department,
+            JobTitle : e.JobTitle,
+            HireDate : e.HireDate,
+            IsActive : e.IsActive,
+            CreatedAtUtc : e.CreatedAtUtc
         )).ToList();
         
         _logger.LogInformation("Successfully retrieved {Count} employees", employees.Count);
