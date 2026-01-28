@@ -1,6 +1,6 @@
-namespace Attendance.Domain.Common;
-
-public class EntityBase
-{
-    
-}
+// namespace Attendance.Domain.Common;
+//
+// public class EntityBase
+// {
+//     
+// }

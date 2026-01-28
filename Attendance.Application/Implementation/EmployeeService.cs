@@ -1,8 +1,8 @@
 using Attendance.Application.Abstractions.Repositories;
 using Attendance.Application.Abstractions.Services;
 using Attendance.Application.Dto;
-using Attendance.Domain.Common;
 using Attendance.Domain.Entities;
+using Attendance.Shared.GenericResponse;
 using Microsoft.Extensions.Logging;
 using QRCoder;
 

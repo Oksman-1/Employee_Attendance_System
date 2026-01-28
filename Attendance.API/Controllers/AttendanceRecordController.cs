@@ -1,7 +1,7 @@
 using Attendance.API.Extension;
 using Attendance.Application.Abstractions.Services;
 using Attendance.Application.Dto;
-using Attendance.Domain.Common;
+using Attendance.Shared.GenericResponse;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendance.API.Controllers;

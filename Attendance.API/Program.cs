@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Attendance.API.Extension;
-using Attendance.Domain.Common;
 using Attendance.Infrastructure;
+using Attendance.Shared;
+using Attendance.Shared.Common;
+using Attendance.Shared.SerilogEnricher;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,12 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 //Configure Serilog 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.File("Logs/log--.txt", rollingInterval: RollingInterval.Day)
-    .Enrich.FromLogContext()
-    .MinimumLevel.Information()
-    .CreateLogger();
+LoggingConfiguration.Configure();
+
+// Log.Logger = new LoggerConfiguration()
+//     .WriteTo.Console()
+//     .WriteTo.File("Logs/log--.txt", rollingInterval: RollingInterval.Day)
+//     .Enrich.FromLogContext()
+//     .MinimumLevel.Information()
+//     .CreateLogger();
 
 // Replaces default logging
 builder.Host.UseSerilog();

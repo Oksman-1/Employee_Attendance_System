@@ -1,5 +1,5 @@
 using Attendance.Application.Dto;
-using Attendance.Domain.Common;
+using Attendance.Shared.GenericResponse;
 
 namespace Attendance.Application.Abstractions.Services;
 

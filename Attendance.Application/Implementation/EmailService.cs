@@ -1,5 +1,5 @@
 using Attendance.Application.Abstractions.Services;
-using Attendance.Domain.Common;
+using Attendance.Shared.Common;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 using MailKit.Net.Smtp;

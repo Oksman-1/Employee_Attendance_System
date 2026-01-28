@@ -1,4 +1,4 @@
-using Attendance.Domain.Common;
+using Attendance.Shared.GenericResponse;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendance.API.Controllers;
