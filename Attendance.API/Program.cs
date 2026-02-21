@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Attendance.API.Extension;
 using Attendance.Infrastructure;
-using Attendance.Shared;
 using Attendance.Shared.Common;
 using Attendance.Shared.SerilogEnricher;
 using Serilog;

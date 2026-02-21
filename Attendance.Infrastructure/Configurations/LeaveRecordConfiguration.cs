@@ -8,12 +8,13 @@ public class LeaveRecordConfiguration : IEntityTypeConfiguration<LeaveRecord>
 {
     public void Configure(EntityTypeBuilder<LeaveRecord> builder)
     {
+        
         builder.ToTable("LeaveRecords", table =>
         {
-            table.HasCheckConstraint("CK_LeaveRecord_DateRange", "[EndDate] >= [StartDate]");
+            table.HasCheckConstraint("CK_LeaveRecord_DateRange", "[END_DATE] >= [START_DATE]"
+            );
         });
-
-
+        
         // Primary Key
         builder.HasKey(lr => lr.Id);
         
