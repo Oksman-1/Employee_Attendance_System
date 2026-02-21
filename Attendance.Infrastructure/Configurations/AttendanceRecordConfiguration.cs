@@ -8,7 +8,7 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
 {
     public void Configure(EntityTypeBuilder<AttendanceRecord> builder)
     {
-        builder.ToTable("AttendanceRecords");
+        builder.ToTable("AttendanceRecords", "Attendance");
         
         //Primary key
         builder.HasKey(a => a.Id);

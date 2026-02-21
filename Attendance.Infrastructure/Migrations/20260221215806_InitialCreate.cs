@@ -39,6 +39,7 @@ namespace Attendance.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Shifts",
+                schema: "Attendance",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -56,6 +57,7 @@ namespace Attendance.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "AttendanceRecords",
+                schema: "Attendance",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -82,6 +84,7 @@ namespace Attendance.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "LeaveRecords",
+                schema: "Attendance",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -107,6 +110,7 @@ namespace Attendance.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "EmployeeShifts",
+                schema: "Attendance",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -128,6 +132,7 @@ namespace Attendance.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_EmployeeShifts_Shifts_SHIFT_ID",
                         column: x => x.SHIFT_ID,
+                        principalSchema: "Attendance",
                         principalTable: "Shifts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -135,6 +140,7 @@ namespace Attendance.Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_AttendanceRecords_EmployeeId_ATTENDANCE_DATE",
+                schema: "Attendance",
                 table: "AttendanceRecords",
                 columns: new[] { "EmployeeId", "ATTENDANCE_DATE" },
                 unique: true);
@@ -162,22 +168,26 @@ namespace Attendance.Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeShift_EmployeeId_AssignedDate",
+                schema: "Attendance",
                 table: "EmployeeShifts",
                 columns: new[] { "EMPLOYEE_ID", "ASSIGNED_DATE" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeShifts_SHIFT_ID",
+                schema: "Attendance",
                 table: "EmployeeShifts",
                 column: "SHIFT_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LeaveRecords_EMPLOYEE_ID",
+                schema: "Attendance",
                 table: "LeaveRecords",
                 column: "EMPLOYEE_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Shifts_NAME",
+                schema: "Attendance",
                 table: "Shifts",
                 column: "NAME",
                 unique: true);
@@ -187,16 +197,20 @@ namespace Attendance.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AttendanceRecords");
+                name: "AttendanceRecords",
+                schema: "Attendance");
 
             migrationBuilder.DropTable(
-                name: "EmployeeShifts");
+                name: "EmployeeShifts",
+                schema: "Attendance");
 
             migrationBuilder.DropTable(
-                name: "LeaveRecords");
+                name: "LeaveRecords",
+                schema: "Attendance");
 
             migrationBuilder.DropTable(
-                name: "Shifts");
+                name: "Shifts",
+                schema: "Attendance");
 
             migrationBuilder.DropTable(
                 name: "Employees",

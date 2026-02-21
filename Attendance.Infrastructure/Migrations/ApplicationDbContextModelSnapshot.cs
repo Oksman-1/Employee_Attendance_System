@@ -62,7 +62,7 @@ namespace Attendance.Infrastructure.Migrations
                     b.HasIndex("EmployeeId", "AttendanceDate")
                         .IsUnique();
 
-                    b.ToTable("AttendanceRecords", null, t =>
+                    b.ToTable("AttendanceRecords", "Attendance", t =>
                         {
                             t.HasCheckConstraint("CK_Attendance_ClockTimes_Valid", "[CLOCK_OUT_UTC] IS NULL OR [CLOCK_OUT_UTC] >= [CLOCK_IN_UTC]");
                         });
@@ -175,7 +175,7 @@ namespace Attendance.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_EmployeeShift_EmployeeId_AssignedDate");
 
-                    b.ToTable("EmployeeShifts", (string)null);
+                    b.ToTable("EmployeeShifts", "Attendance");
                 });
 
             modelBuilder.Entity("Attendance.Domain.Entities.LeaveRecord", b =>
@@ -214,7 +214,7 @@ namespace Attendance.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("LeaveRecords", null, t =>
+                    b.ToTable("LeaveRecords", "Attendance", t =>
                         {
                             t.HasCheckConstraint("CK_LeaveRecord_DateRange", "[END_DATE] >= [START_DATE]");
                         });
@@ -253,7 +253,7 @@ namespace Attendance.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Shifts", null, t =>
+                    b.ToTable("Shifts", "Attendance", t =>
                         {
                             t.HasCheckConstraint("CK_Shift_StartEnd", "[END_TIME] > [START_TIME]");
                         });

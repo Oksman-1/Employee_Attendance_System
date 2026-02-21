@@ -9,7 +9,7 @@ public class LeaveRecordConfiguration : IEntityTypeConfiguration<LeaveRecord>
     public void Configure(EntityTypeBuilder<LeaveRecord> builder)
     {
         
-        builder.ToTable("LeaveRecords", table =>
+        builder.ToTable("LeaveRecords", "Attendance",  table =>
         {
             table.HasCheckConstraint("CK_LeaveRecord_DateRange", "[END_DATE] >= [START_DATE]"
             );

@@ -8,7 +8,7 @@ public class EmployeeShiftConfiguration : IEntityTypeConfiguration<EmployeeShift
 {
     public void Configure(EntityTypeBuilder<EmployeeShift> builder)
     {
-        builder.ToTable("EmployeeShifts");
+        builder.ToTable("EmployeeShifts" , "Attendance");
         
         //Primary Key
         builder.HasKey(es => es.Id);
