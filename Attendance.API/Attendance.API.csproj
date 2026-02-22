@@ -26,4 +26,8 @@
       <ProjectReference Include="..\Attendance.Shared\Attendance.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
 </Project>
