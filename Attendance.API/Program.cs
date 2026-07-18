@@ -75,8 +75,15 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var identityService = scope.ServiceProvider.GetRequiredService<Attendance.Application.Abstractions.Services.IIdentityService>();
+    await identityService.SeedRolesAsync();
+}
 
 app.Run();

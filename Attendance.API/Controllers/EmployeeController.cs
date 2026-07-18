@@ -2,6 +2,7 @@ using Attendance.API.Extension;
 using Attendance.Application.Abstractions.Services;
 using Attendance.Application.Dto;
 using Attendance.Shared.GenericResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendance.API.Controllers;
@@ -52,6 +53,7 @@ public class EmployeeController : BaseController
     }
     
     [HttpPost("api/v1/create-employee")]
+    [Authorize(Roles = "Admin")]
     [ServiceFilter<ValidationFilterAttribute>] // ensures DTO validation runs
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> CreateEmployeeAsync([FromBody] CreateEmployeeDto createEmployeeDto, CancellationToken ct = default)
@@ -64,6 +66,7 @@ public class EmployeeController : BaseController
     }
     
     [HttpPut("api/v1/update-employee")]
+    [Authorize(Roles = "Admin")]
     [ServiceFilter<ValidationFilterAttribute>] // ensures DTO validation runs
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> UpdateEmployeeAsync([FromBody] UpdateEmployeeDto updateEmployeeDto, CancellationToken ct = default)
@@ -76,6 +79,7 @@ public class EmployeeController : BaseController
     }
     
     [HttpDelete("api/v1/delete-employee/{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> DeleteEmployeeAsync([FromRoute] int id, CancellationToken ct = default)
     {

@@ -13,12 +13,14 @@ public class EmployeeService : IEmployeeService
 {
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ILogger<EmployeeService> _logger;
+    private readonly IIdentityService _identityService;
     
     
-    public EmployeeService(IEmployeeRepository employeeRepository, ILogger<EmployeeService> logger)
+    public EmployeeService(IEmployeeRepository employeeRepository, ILogger<EmployeeService> logger, IIdentityService identityService)
     {
         _employeeRepository = employeeRepository;
         _logger = logger;
+        _identityService = identityService;
     }
     
     public async Task<GenericResponse<EmployeeDto>> GetEmployeeByIdAsync(int id, CancellationToken ct = default)
@@ -37,7 +39,7 @@ public class EmployeeService : IEmployeeService
         }
 
         var employeeDto = new EmployeeDto(
-           Id : employee.Id,
+            Id : employee.Id,
             EmployeeCode : employee.EmployeeCode,
             FullName : employee.FullName,
             Email : employee.Email,
@@ -135,8 +137,17 @@ public class EmployeeService : IEmployeeService
         // Generate a new QR code value (this should be a unique, URL-safe string)
         var qrCodeValue = GenerateQrCode(createEmployeeDto.EmployeeCode);
         
+        // Create Identity User first
+        var identityResponse = await _identityService.CreateUserAsync(createEmployeeDto.Email, "Password123!", "Employee");
+        if (identityResponse.ResponseCode != "200" && identityResponse.ResponseCode != "201")
+        {
+             _logger.LogError("Failed to create Identity user for employee {employeeCode}: {message}", createEmployeeDto.EmployeeCode, identityResponse.ResponseMessage);
+             return GenericResponse<string>.InternalError($"Failed to create authentication account: {identityResponse.ResponseMessage}");
+        }
+        
         var newEmployee = new Employee
         {
+            IdentityUserId = identityResponse.Data,
             EmployeeCode = createEmployeeDto.EmployeeCode,
             FullName = createEmployeeDto.FullName,
             Email = createEmployeeDto.Email,

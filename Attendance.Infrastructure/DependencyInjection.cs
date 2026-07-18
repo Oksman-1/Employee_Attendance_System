@@ -10,6 +10,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Identity;
+using Attendance.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Attendance.Infrastructure.Implementation;
 
 
 namespace Attendance.Infrastructure;
@@ -22,6 +28,33 @@ public static class DependencyInjection
          services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
+        // Configure Identity
+        services.AddIdentity<ApplicationUser, IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+        // Configure JWT Authentication
+        var jwtSettings = configuration.GetSection("Jwt");
+        var key = Encoding.ASCII.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key missing"));
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+        });
         
         //Add Repositories
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -42,6 +75,7 @@ public static class DependencyInjection
          services.AddScoped<ILeaveRecordService, LeaveRecordService>();
          services.AddScoped<IShiftService, ShiftService>();
          services.AddScoped<IReportingService, ReportingService>();
+         services.AddScoped<IIdentityService, IdentityService>();
         
         // Register FluentValidation validators
         services.AddValidatorsFromAssemblyContaining<CreateEmployeeDtoValidator>();

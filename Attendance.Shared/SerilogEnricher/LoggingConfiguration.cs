@@ -2,7 +2,7 @@
 
 namespace Attendance.Shared.SerilogEnricher;
 
-public static class LoggingConfiguration
+public static class   LoggingConfiguration
 {
     public static void Configure()
     {
@@ -26,4 +26,4 @@ public static class LoggingConfiguration
             .WriteTo.File("Logs/log--.txt", rollingInterval: RollingInterval.Day, outputTemplate: "[{Timestamp:dd-MMM-yyyy:hh:mm:ss tt} {Level:u3}-API===>{ShortSourceContext}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
     }
-}
+} 
