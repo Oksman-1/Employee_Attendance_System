@@ -4,7 +4,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace Attendance.Domain.Common;
+namespace Attendance.Shared.Common;
 
 public class AttendanceReportDocument : IDocument
 {

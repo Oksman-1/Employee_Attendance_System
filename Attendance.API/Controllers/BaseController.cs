@@ -1,8 +1,10 @@
-using Attendance.Domain.Common;
+using Attendance.Shared.GenericResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendance.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("hamilton-surveillance/employee-attendance-service")]
 public abstract class BaseController : ControllerBase

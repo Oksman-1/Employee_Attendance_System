@@ -1,21 +1,22 @@
 using Attendance.API.Extension;
 using Attendance.Application.Abstractions.Services;
 using Attendance.Application.Dto;
-using Attendance.Domain.Common;
+using Attendance.Shared.GenericResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendance.API.Controllers;
 
 [ApiController]
-public class EmployeeServiceController : BaseController
+public class EmployeeController : BaseController
 {
     private readonly IEmployeeService _employeeService;
-    private readonly ILogger<EmployeeServiceController> _logger;
+    private readonly ILogger<EmployeeController> _logger;
     
-    public EmployeeServiceController(IEmployeeService employeeService, ILogger<EmployeeServiceController> logger)
+    public EmployeeController(IEmployeeService employeeService, ILogger<EmployeeController> logger)
     {
         _employeeService = employeeService ?? throw new ArgumentException(nameof(IEmployeeService));
-        _logger = logger ?? throw new ArgumentException(nameof(ILogger<EmployeeServiceController>));
+        _logger = logger ?? throw new ArgumentException(nameof(ILogger<EmployeeController>));
     }
     
     [HttpGet("api/v1/get-employee-by-id")]
@@ -52,6 +53,7 @@ public class EmployeeServiceController : BaseController
     }
     
     [HttpPost("api/v1/create-employee")]
+    [Authorize(Roles = "Admin")]
     [ServiceFilter<ValidationFilterAttribute>] // ensures DTO validation runs
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> CreateEmployeeAsync([FromBody] CreateEmployeeDto createEmployeeDto, CancellationToken ct = default)
@@ -64,6 +66,7 @@ public class EmployeeServiceController : BaseController
     }
     
     [HttpPut("api/v1/update-employee")]
+    [Authorize(Roles = "Admin")]
     [ServiceFilter<ValidationFilterAttribute>] // ensures DTO validation runs
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> UpdateEmployeeAsync([FromBody] UpdateEmployeeDto updateEmployeeDto, CancellationToken ct = default)
@@ -76,6 +79,7 @@ public class EmployeeServiceController : BaseController
     }
     
     [HttpDelete("api/v1/delete-employee/{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> DeleteEmployeeAsync([FromRoute] int id, CancellationToken ct = default)
     {

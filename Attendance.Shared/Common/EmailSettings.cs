@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Attendance.Domain.Common;
+namespace Attendance.Shared.Common;
 
 public class EmailSettings
 { 

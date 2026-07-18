@@ -1,7 +1,7 @@
 using System.Reflection.Metadata;
 using Attendance.Application.Abstractions.Repositories;
 using Attendance.Application.Abstractions.Services;
-using Attendance.Domain.Common;
+using Attendance.Shared.Common;
 using QuestPDF.Fluent;
 
 namespace Attendance.Application.Implementation;

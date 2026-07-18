@@ -1,8 +1,8 @@
 using Attendance.Application.Abstractions.Repositories;
 using Attendance.Application.Abstractions.Services;
 using Attendance.Application.Dto;
-using Attendance.Domain.Common;
 using Attendance.Domain.Entities;
+using Attendance.Shared.GenericResponse;
 using Microsoft.Extensions.Logging;
 using QRCoder;
 
@@ -13,12 +13,14 @@ public class EmployeeService : IEmployeeService
 {
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ILogger<EmployeeService> _logger;
+    private readonly IIdentityService _identityService;
     
     
-    public EmployeeService(IEmployeeRepository employeeRepository, ILogger<EmployeeService> logger)
+    public EmployeeService(IEmployeeRepository employeeRepository, ILogger<EmployeeService> logger, IIdentityService identityService)
     {
         _employeeRepository = employeeRepository;
         _logger = logger;
+        _identityService = identityService;
     }
     
     public async Task<GenericResponse<EmployeeDto>> GetEmployeeByIdAsync(int id, CancellationToken ct = default)
@@ -37,15 +39,15 @@ public class EmployeeService : IEmployeeService
         }
 
         var employeeDto = new EmployeeDto(
-            employee.Id,
-            employee.EmployeeCode,
-            employee.FullName,
-            employee.Email,
-            employee.Department,
-            employee.JobTitle,
-            employee.HireDate,
-            employee.IsActive,
-            employee.CreatedAtUtc
+            Id : employee.Id,
+            EmployeeCode : employee.EmployeeCode,
+            FullName : employee.FullName,
+            Email : employee.Email,
+            Department : employee.Department,
+            JobTitle : employee.JobTitle,
+            HireDate : employee.HireDate,
+            IsActive : employee.IsActive,
+            CreatedAtUtc : employee.CreatedAtUtc
         );
 
         _logger.LogInformation("Successfully retrieved employee {@employee}", employee);
@@ -68,15 +70,15 @@ public class EmployeeService : IEmployeeService
         }
 
         var employeeDto = new EmployeeDto(
-            employee.Id,
-            employee.EmployeeCode,
-            employee.FullName,
-            employee.Email,
-            employee.Department,
-            employee.JobTitle,
-            employee.HireDate,
-            employee.IsActive,
-            employee.CreatedAtUtc
+            Id : employee.Id,
+            EmployeeCode : employee.EmployeeCode,
+            FullName : employee.FullName,
+            Email : employee.Email,
+            Department : employee.Department,
+            JobTitle : employee.JobTitle,
+            HireDate : employee.HireDate,
+            IsActive : employee.IsActive,
+            CreatedAtUtc : employee.CreatedAtUtc
         );
 
         _logger.LogInformation("Successfully retrieved employee {@employee}", employee);
@@ -100,15 +102,15 @@ public class EmployeeService : IEmployeeService
         }
 
         var employeeDtos = employees.Select(e => new EmployeeDto(
-            e.Id,
-            e.EmployeeCode,
-            e.FullName,
-            e.Email,
-            e.Department,
-            e.JobTitle,
-            e.HireDate,
-            e.IsActive,
-            e.CreatedAtUtc
+            Id : e.Id,
+            EmployeeCode : e.EmployeeCode,
+            FullName : e.FullName,
+            Email : e.Email,
+            Department : e.Department,
+            JobTitle : e.JobTitle,
+            HireDate : e.HireDate,
+            IsActive : e.IsActive,
+            CreatedAtUtc : e.CreatedAtUtc
         )).ToList();
         
         _logger.LogInformation("Successfully retrieved {Count} employees", employees.Count);
@@ -135,8 +137,17 @@ public class EmployeeService : IEmployeeService
         // Generate a new QR code value (this should be a unique, URL-safe string)
         var qrCodeValue = GenerateQrCode(createEmployeeDto.EmployeeCode);
         
+        // Create Identity User first
+        var identityResponse = await _identityService.CreateUserAsync(createEmployeeDto.Email, "Password123!", "Employee");
+        if (identityResponse.ResponseCode != "200" && identityResponse.ResponseCode != "201")
+        {
+             _logger.LogError("Failed to create Identity user for employee {employeeCode}: {message}", createEmployeeDto.EmployeeCode, identityResponse.ResponseMessage);
+             return GenericResponse<string>.InternalError($"Failed to create authentication account: {identityResponse.ResponseMessage}");
+        }
+        
         var newEmployee = new Employee
         {
+            IdentityUserId = identityResponse.Data,
             EmployeeCode = createEmployeeDto.EmployeeCode,
             FullName = createEmployeeDto.FullName,
             Email = createEmployeeDto.Email,

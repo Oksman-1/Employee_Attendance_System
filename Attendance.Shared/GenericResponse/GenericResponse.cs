@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Attendance.Domain.Common;
+namespace Attendance.Shared.GenericResponse;
 
 public class GenericResponse<T>
 {

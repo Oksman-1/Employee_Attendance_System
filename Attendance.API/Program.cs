@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Attendance.API.Extension;
-using Attendance.Domain.Common;
 using Attendance.Infrastructure;
+using Attendance.Shared.Common;
+using Attendance.Shared.SerilogEnricher;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,12 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 //Configure Serilog 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.File("Logs/log--.txt", rollingInterval: RollingInterval.Day)
-    .Enrich.FromLogContext()
-    .MinimumLevel.Information()
-    .CreateLogger();
+LoggingConfiguration.Configure();
+
+// Log.Logger = new LoggerConfiguration()
+//     .WriteTo.Console()
+//     .WriteTo.File("Logs/log--.txt", rollingInterval: RollingInterval.Day)
+//     .Enrich.FromLogContext()
+//     .MinimumLevel.Information()
+//     .CreateLogger();
 
 // Replaces default logging
 builder.Host.UseSerilog();
@@ -26,23 +30,43 @@ builder.Services.AddOptions<EmailSettings>()
     .ValidateOnStart(); 
 
 // Add services to the container.
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+
 builder.Services.AddScoped<ValidationFilterAttribute>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Register Swagger generator
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Register Swagger
+builder.Services.AddSwaggerDocumentation();
 
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// if (app.Environment.IsDevelopment())
+// {
+//     app.MapOpenApi();
+//     //app.UseSwagger();
+//     //app.UseSwaggerUI();
+// }
+
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Dev" ||
+    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "uat")
 {
-    app.MapOpenApi();
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    
 }
 
 app.UseCors("CorsPolicy");
@@ -51,8 +75,15 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var identityService = scope.ServiceProvider.GetRequiredService<Attendance.Application.Abstractions.Services.IIdentityService>();
+    await identityService.SeedRolesAsync();
+}
 
 app.Run();
