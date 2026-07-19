@@ -3,9 +3,11 @@ using Attendance.Application.Abstractions.Services;
 using Attendance.Application.Dto;
 using Attendance.Domain.Entities;
 using Attendance.Shared.GenericResponse;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using QRCoder;
-
+using ClosedXML.Excel;
+using System.IO;
 
 namespace Attendance.Application.Implementation;
 
@@ -14,13 +16,15 @@ public class EmployeeService : IEmployeeService
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ILogger<EmployeeService> _logger;
     private readonly IIdentityService _identityService;
+    private readonly IConfiguration _configuration;
     
     
-    public EmployeeService(IEmployeeRepository employeeRepository, ILogger<EmployeeService> logger, IIdentityService identityService)
+    public EmployeeService(IEmployeeRepository employeeRepository, ILogger<EmployeeService> logger, IIdentityService identityService, IConfiguration configuration)
     {
         _employeeRepository = employeeRepository;
         _logger = logger;
         _identityService = identityService;
+        _configuration = configuration;
     }
     
     public async Task<GenericResponse<EmployeeDto>> GetEmployeeByIdAsync(int id, CancellationToken ct = default)
@@ -137,8 +141,10 @@ public class EmployeeService : IEmployeeService
         // Generate a new QR code value (this should be a unique, URL-safe string)
         var qrCodeValue = GenerateQrCode(createEmployeeDto.EmployeeCode);
         
+        var defaultPassword = _configuration["DefaultEmployeePassword"] ?? "Password123!";
+        
         // Create Identity User first
-        var identityResponse = await _identityService.CreateUserAsync(createEmployeeDto.Email, "Password123!", "Employee");
+        var identityResponse = await _identityService.CreateUserAsync(createEmployeeDto.Email, defaultPassword, "Employee");
         if (identityResponse.ResponseCode != "200" && identityResponse.ResponseCode != "201")
         {
              _logger.LogError("Failed to create Identity user for employee {employeeCode}: {message}", createEmployeeDto.EmployeeCode, identityResponse.ResponseMessage);
@@ -181,6 +187,16 @@ public class EmployeeService : IEmployeeService
             return GenericResponse<string>.NotFound("Employee not found");
         }
         
+        if (existingEmployee.Email != updateEmployeeDto.Email)
+        {
+            var identityResult = await _identityService.UpdateUserEmailAsync(existingEmployee.Email, updateEmployeeDto.Email);
+            if (identityResult.ResponseCode != "200")
+            {
+                _logger.LogError("Failed to sync employee email change to Identity: {Message}", identityResult.ResponseMessage);
+                return GenericResponse<string>.InternalError("Failed to update employee login email. Profile update aborted.");
+            }
+        }
+        
         existingEmployee.FullName = updateEmployeeDto.FullName;
         existingEmployee.Email = updateEmployeeDto.Email;
         existingEmployee.Department = updateEmployeeDto.Department;
@@ -217,6 +233,77 @@ public class EmployeeService : IEmployeeService
         return GenericResponse<string>.Success("Employee deleted successfully", null, "200");
     }
     
+    public async Task<GenericResponse<BatchCreateEmployeeResponseDto>> BatchCreateEmployeesAsync(Stream fileStream, CancellationToken ct = default)
+    {
+        _logger.LogInformation($"==============Inside {nameof(BatchCreateEmployeesAsync)}==============");
+        
+        var responseDto = new BatchCreateEmployeeResponseDto();
+        var validator = new DtoValidation.CreateEmployeeDtoValidator();
+
+        try
+        {
+            using var workbook = new XLWorkbook(fileStream);
+            var worksheet = workbook.Worksheet(1);
+            var rows = worksheet.RangeUsed().RowsUsed().Skip(1); // Skip header row
+
+            foreach (var row in rows)
+            {
+                responseDto.TotalRows++;
+                try
+                {
+                    var employeeCode = row.Cell(1).GetString();
+                    var fullName = row.Cell(2).GetString();
+                    var email = row.Cell(3).GetString();
+                    var department = row.Cell(4).GetString();
+                    var jobTitle = row.Cell(5).GetString();
+                    
+                    DateTime hireDate = DateTime.UtcNow;
+                    var hireDateCell = row.Cell(6);
+                    if (hireDateCell.DataType == XLDataType.DateTime)
+                    {
+                        hireDate = hireDateCell.GetDateTime();
+                    }
+                    else if (!DateTime.TryParse(hireDateCell.GetString(), out hireDate))
+                    {
+                        responseDto.Errors.Add($"Row {row.RowNumber()}: Invalid HireDate format.");
+                        continue;
+                    }
+                    
+                    var createDto = new CreateEmployeeDto(employeeCode, fullName, email, department, jobTitle, hireDate);
+                    
+                    var validationResult = await validator.ValidateAsync(createDto, ct);
+                    if (!validationResult.IsValid)
+                    {
+                        responseDto.Errors.Add($"Row {row.RowNumber()}: " + string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
+                        continue;
+                    }
+                    
+                    var createResult = await CreateEmployeeAsync(createDto, ct);
+                    if (createResult.ResponseCode == "200" || createResult.ResponseCode == "201")
+                    {
+                        responseDto.SuccessfulCount++;
+                    }
+                    else
+                    {
+                        responseDto.Errors.Add($"Row {row.RowNumber()}: {createResult.ResponseMessage}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error processing row {RowNumber}", row.RowNumber());
+                    responseDto.Errors.Add($"Row {row.RowNumber()}: Unexpected error - {ex.Message}");
+                }
+            }
+            
+            return GenericResponse<BatchCreateEmployeeResponseDto>.Success("Batch processing completed", responseDto, "200");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error opening excel file");
+            return GenericResponse<BatchCreateEmployeeResponseDto>.InternalError("Failed to parse the Excel file. Please ensure it is a valid .xlsx file.");
+        }
+    }
+
     private string GenerateQrCode(string employeeCode)
     {
         //Create unique QR value

@@ -10,5 +10,6 @@ public interface IEmployeeService
     Task<GenericResponse<List<EmployeeDto>>> GetAllEmployeesAsync(CancellationToken ct = default);
     Task<GenericResponse<string>> CreateEmployeeAsync(CreateEmployeeDto createEmployeeDto, CancellationToken ct = default);
     Task<GenericResponse<string>> UpdateEmployeeAsync(UpdateEmployeeDto updateEmployeeDto, CancellationToken ct = default);
+    Task<GenericResponse<BatchCreateEmployeeResponseDto>> BatchCreateEmployeesAsync(Stream fileStream, CancellationToken ct = default);
     Task<GenericResponse<string>> DeleteEmployeeAsync(int id, CancellationToken ct = default);
 }

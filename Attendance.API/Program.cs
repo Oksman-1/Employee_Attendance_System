@@ -7,6 +7,11 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.EnvironmentName == "Dev")
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 var configuration = builder.Configuration;
 
 //Configure Serilog 
@@ -84,6 +89,7 @@ using (var scope = app.Services.CreateScope())
 {
     var identityService = scope.ServiceProvider.GetRequiredService<Attendance.Application.Abstractions.Services.IIdentityService>();
     await identityService.SeedRolesAsync();
+    await identityService.SeedDefaultAdminAsync();
 }
 
 app.Run();

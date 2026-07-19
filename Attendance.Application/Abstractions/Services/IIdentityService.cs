@@ -8,4 +8,8 @@ public interface IIdentityService
     Task<GenericResponse<AuthResponseDto>> LoginAsync(LoginRequestDto request);
     Task<GenericResponse<string>> CreateUserAsync(string email, string password, string role);
     Task SeedRolesAsync();
+    Task SeedDefaultAdminAsync();
+    Task<GenericResponse<string>> UpdateUserEmailAsync(string oldEmail, string newEmail);
+    Task<GenericResponse<string>> ChangePasswordAsync(string email, string currentPassword, string newPassword);
+    Task<GenericResponse<string>> ResetPasswordAsync(string email, string newPassword);
 }
