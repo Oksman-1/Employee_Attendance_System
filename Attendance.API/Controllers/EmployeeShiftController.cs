@@ -2,6 +2,7 @@ using Attendance.API.Extension;
 using Attendance.Application.Abstractions.Services;
 using Attendance.Application.Dto;
 using Attendance.Shared.GenericResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendance.API.Controllers;
@@ -19,6 +20,7 @@ public class EmployeeShiftController : BaseController
     }
     
     [HttpPost("api/v1/assign-employee-shift")]
+    [Authorize(Roles = "Admin")]
     [ServiceFilter<ValidationFilterAttribute>]
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> AssignEmployeeShiftAsync([FromBody] CreateEmployeeShiftDto createEmployeeShiftDto, CancellationToken ct = default)
@@ -31,6 +33,7 @@ public class EmployeeShiftController : BaseController
     }
     
     [HttpDelete("api/v1/unassign-employee-shift/{employeeShiftId}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> UnassignEmployeeShiftAsync([FromRoute] int employeeShiftId, CancellationToken ct = default)
     {
@@ -97,6 +100,7 @@ public class EmployeeShiftController : BaseController
     }
     
     [HttpDelete("api/v1/delete-employee-shift")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> DeleteEmployeeShiftAsync([FromQuery] int employeeShiftId, CancellationToken ct = default)
     {

@@ -38,9 +38,10 @@ public class EmailService : IEmailService
             message.Body = builder.ToMessageBody();
             
             using var smtp = new SmtpClient();
-            var useSsl = _emailSettings.UseSSL ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls;
-            await smtp.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, useSsl, ct);
-            await smtp.AuthenticateAsync(_emailSettings.Username, _emailSettings.SmtpServer, ct);
+            
+            // Using Auto allows MailKit to automatically figure out if it should use SSL (port 465) or StartTLS (port 587)
+            await smtp.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.Port, SecureSocketOptions.Auto, ct);
+            await smtp.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password, ct);
             await smtp.SendAsync(message, ct);
             await smtp.DisconnectAsync(true, ct);
             

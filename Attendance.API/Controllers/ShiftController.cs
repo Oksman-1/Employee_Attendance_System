@@ -2,6 +2,7 @@ using Attendance.API.Extension;
 using Attendance.Application.Abstractions.Services;
 using Attendance.Application.Dto;
 using Attendance.Shared.GenericResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendance.API.Controllers;
@@ -19,6 +20,7 @@ public class ShiftController : BaseController
     }
     
     [HttpPost("api/v1/create-shift")]
+    [Authorize(Roles = "Admin")]
     [ServiceFilter<ValidationFilterAttribute>]
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> CreateShiftAsync([FromBody] CreateShiftDto createShiftDto, CancellationToken ct = default)
@@ -31,6 +33,7 @@ public class ShiftController : BaseController
     }
     
     [HttpPut("api/v1/update-shift")]
+    [Authorize(Roles = "Admin")]
     [ServiceFilter<ValidationFilterAttribute>]
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> UpdateShiftAsync([FromBody] UpdateShiftDto updateShiftDto, CancellationToken ct = default)
@@ -43,12 +46,15 @@ public class ShiftController : BaseController
     }
     
     [HttpGet("api/v1/get-shift-by-id")]
-    [ProducesResponseType(typeof(GenericResponse<ShiftDto>), 200)]
-    public async Task<IActionResult> GetShiftByIdAsync([FromQuery] int shiftId, CancellationToken ct = default)
+    [ServiceFilter<ValidationFilterAttribute>]
+    [ProducesResponseType(typeof(GenericResponse<ShiftDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GenericResponse<string>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> GetShiftByIdAsync([FromQuery] GetShiftByIdDto request, CancellationToken ct = default)
     {
-        _logger.LogInformation($"==============Inside {nameof(GetShiftByIdAsync)} controller==============");
+        _logger.LogInformation("==============Inside {MethodName} controller==============", nameof(GetShiftByIdAsync));
 
-        var response = await _shiftService.GetShiftByIdAsync(shiftId, ct);
+        var response = await _shiftService.GetShiftByIdAsync(request.ShiftId, ct);
 
         return ToHttpResult(response);
     }
@@ -76,6 +82,7 @@ public class ShiftController : BaseController
     }
 
     [HttpDelete("api/v1/delete-shift")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(GenericResponse<string>), 200)]
     public async Task<IActionResult> DeleteShiftAsync([FromQuery] int shiftId, CancellationToken ct = default)
     {

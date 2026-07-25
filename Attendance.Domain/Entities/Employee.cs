@@ -9,9 +9,8 @@ public class Employee
     public string Email { get; set; } = string.Empty; 
     public string? Department { get; set; }
     public string JobTitle { get; set; }  = string.Empty;
-    
-    // Unique, URL-safe token string that we encode as a QR image in the backend
     public string QrCode { get; private set; }  = string.Empty;
+    public string PinHash { get; set; } = string.Empty;
     public DateTime HireDate { get; set; }
     public DateTimeOffset CreatedAtUtc { get; private set; }  = DateTimeOffset.UtcNow;
    

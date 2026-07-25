@@ -62,6 +62,7 @@ public static class DependencyInjection
         services.AddScoped<IEmployeeShiftRepository, EmployeeShiftRepository>();
         services.AddScoped<ILeaveRecordRepository, LeaveRecordRepository>();
         services.AddScoped<IShiftRepository, ShiftRepository>();
+        services.AddScoped<IEmployeeMigrationRepository, EmployeeMigrationRepository>();
         
         
         

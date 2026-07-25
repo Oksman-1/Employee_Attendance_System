@@ -22,6 +22,13 @@ public class EmployeeRepository(ApplicationDbContext _context) : IEmployeeReposi
            .FirstOrDefaultAsync(e => e.QrCode == qrCode, ct);
     }
 
+    public async Task<Employee?> GetByEmailAsync(string email, CancellationToken ct = default)
+    {
+       return await _context.Employees
+           .AsNoTracking()
+           .FirstOrDefaultAsync(e => e.Email == email, ct);
+    }
+
     public async Task<List<Employee>> GetAllAsync(CancellationToken ct = default)
     {
         return await _context.Employees

@@ -4,6 +4,8 @@ using Attendance.Infrastructure;
 using Attendance.Shared.Common;
 using Attendance.Shared.SerilogEnricher;
 using Serilog;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,13 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
+
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 builder.Services.AddScoped<ValidationFilterAttribute>();
 
@@ -90,6 +99,10 @@ using (var scope = app.Services.CreateScope())
     var identityService = scope.ServiceProvider.GetRequiredService<Attendance.Application.Abstractions.Services.IIdentityService>();
     await identityService.SeedRolesAsync();
     await identityService.SeedDefaultAdminAsync();
+    
+    var employeeMigrationRepo = scope.ServiceProvider.GetRequiredService<Attendance.Application.Abstractions.Repositories.IEmployeeMigrationRepository>();
+    var defaultPinHash = HashHelper.ComputeSha256Hash("1234");
+    await employeeMigrationRepo.UpdateEmptyPinHashesAsync(defaultPinHash);
 }
 
 app.Run();

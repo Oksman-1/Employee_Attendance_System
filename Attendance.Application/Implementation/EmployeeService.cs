@@ -161,6 +161,7 @@ public class EmployeeService : IEmployeeService
             JobTitle = createEmployeeDto.JobTitle,
             HireDate = createEmployeeDto.HireDate,
             IsActive = true,
+            PinHash = Attendance.Shared.Common.HashHelper.ComputeSha256Hash("1234")
         };
         
         newEmployee.AssignNewQrCode(qrCodeValue);
