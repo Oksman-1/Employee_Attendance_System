@@ -5,6 +5,5 @@ public record CreateAttendanceRecordDto(
     DateOnly AttendanceDate,
     DateTimeOffset? ClockInAtUtc,
     DateTimeOffset? ClockOutAtUtc,
-    decimal HoursWorked,
     string? Notes
     );

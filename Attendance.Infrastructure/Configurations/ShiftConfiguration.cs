@@ -44,15 +44,5 @@ public class ShiftConfiguration : IEntityTypeConfiguration<Shift>
             .WithOne(es => es.Shift)
             .HasForeignKey(es => es.ShiftId)
             .OnDelete(DeleteBehavior.Cascade);
-        
-        //Constraint to ensure EndTime > StartTime
-        builder.ToTable(t =>
-        {
-            t.HasCheckConstraint(
-                "CK_Shift_StartEnd",
-                "[END_TIME] > [START_TIME]"
-            );
-
-        });
     }
 }

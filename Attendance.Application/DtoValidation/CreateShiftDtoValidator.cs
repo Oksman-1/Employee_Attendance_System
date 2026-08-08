@@ -22,12 +22,33 @@ public class CreateShiftDtoValidator : AbstractValidator<CreateShiftDto>
         RuleFor(x => x.EndTime)
             .NotNull()
             .WithMessage("End time is required.")
-            .GreaterThan(x => x.StartTime)
-            .WithMessage("End time must be later than start time.");
+            .NotEqual(x => x.StartTime)
+            .WithMessage("End time cannot be exactly the same as start time.");
+
+        // Validate Shift Duration (1 to 16 hours)
+        RuleFor(x => x)
+            .Must(HaveValidDuration)
+            .WithMessage("Shift duration must be between 1 and 16 hours.");
 
         // Validate Grace Period
         RuleFor(x => x.GracePeriodMinutes)
             .InclusiveBetween(0, 60)
             .WithMessage("Grace period must be between 0 and 60 minutes.");
+    }
+
+    private bool HaveValidDuration(CreateShiftDto dto)
+    {
+        TimeSpan duration;
+        if (dto.EndTime > dto.StartTime)
+        {
+            duration = dto.EndTime - dto.StartTime;
+        }
+        else
+        {
+            // Overnight shift calculation
+            duration = TimeSpan.FromHours(24) - dto.StartTime + dto.EndTime;
+        }
+
+        return duration.TotalHours >= 1 && duration.TotalHours <= 16;
     }
 }

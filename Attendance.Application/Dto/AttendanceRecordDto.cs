@@ -7,8 +7,7 @@ public record AttendanceRecordDto(
     DateOnly AttendanceDate,
     DateTimeOffset? ClockInAtUtc,
     DateTimeOffset? ClockOutAtUtc,
-    decimal HoursWorked,
-    double CalculatedHoursWorked,
+    double HoursWorked,
     bool IsLate,
     string? Notes  
 );

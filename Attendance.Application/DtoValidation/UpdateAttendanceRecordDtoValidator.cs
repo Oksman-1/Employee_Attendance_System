@@ -15,10 +15,6 @@ public class UpdateAttendanceRecordDtoValidator : AbstractValidator<UpdateAttend
             .NotEmpty()
             .WithMessage("Attendance date is required.");
 
-        RuleFor(x => x.HoursWorked)
-            .GreaterThanOrEqualTo(0)
-            .WithMessage("Hours worked cannot be negative.");
-
         RuleFor(x => x.ClockOutAtUtc)
             .GreaterThan(x => x.ClockInAtUtc)
             .When(x => x.ClockInAtUtc.HasValue && x.ClockOutAtUtc.HasValue)

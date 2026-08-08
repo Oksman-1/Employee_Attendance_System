@@ -17,6 +17,7 @@ public class AttendanceRepository (ApplicationDbContext _context) : IAttendanceR
     public async Task<AttendanceRecord?> GetEmployeeAndDateAsync(int employeeId, DateOnly date, CancellationToken ct = default)
     {
         return await _context.AttendanceRecords
+            .Include(e => e.Employee)
             .FirstOrDefaultAsync(a => a.EmployeeId == employeeId 
                                       && a.AttendanceDate == date, ct);
     }

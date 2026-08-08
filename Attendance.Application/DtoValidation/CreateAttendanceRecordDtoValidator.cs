@@ -13,9 +13,6 @@ public class CreateAttendanceRecordDtoValidator : AbstractValidator<CreateAttend
         RuleFor(x => x.AttendanceDate)
             .NotEmpty().WithMessage("Attendance date is required.");
 
-        RuleFor(x => x.HoursWorked)
-            .GreaterThanOrEqualTo(0).WithMessage("Hours worked cannot be negative.");
-
         RuleFor(x => x.Notes)
             .MaximumLength(500).WithMessage("Notes cannot exceed 500 characters.");
 

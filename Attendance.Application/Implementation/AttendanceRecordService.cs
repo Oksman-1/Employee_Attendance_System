@@ -7,11 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Attendance.Application.Implementation;
 
-public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IAttendanceRepository attendanceRepository) : IAttendanceRecordService
+public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IAttendanceRepository attendanceRepository, IEmployeeRepository employeeRepository) : IAttendanceRecordService
 {
 
     private readonly ILogger<AttendanceRecordService> _logger = logger ?? throw new ArgumentException(nameof(ILogger<AttendanceRecordService>));
     private readonly IAttendanceRepository _attendanceRepository = attendanceRepository ?? throw new ArgumentException(nameof(IAttendanceRepository));
+    private readonly IEmployeeRepository _employeeRepository = employeeRepository ?? throw new ArgumentException(nameof(IEmployeeRepository));
 
 
     public async Task<GenericResponse<string>> CreateAttendanceRecordAsync(CreateAttendanceRecordDto createAttendanceRecordDto, CancellationToken ct = default)
@@ -19,6 +20,13 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
         _logger.LogInformation($"==============Inside {nameof(CreateAttendanceRecordAsync)}==============");
 
         _logger.LogInformation("Creating attendance record for EmployeeId {EmployeeId} on {Date}", createAttendanceRecordDto.EmployeeId, createAttendanceRecordDto.AttendanceDate);
+
+        var employeeExists = await _employeeRepository.GetByIdAsync(createAttendanceRecordDto.EmployeeId, ct);
+        if (employeeExists == null)
+        {
+            _logger.LogWarning("Employee with Id {EmployeeId} not found", createAttendanceRecordDto.EmployeeId);
+            return GenericResponse<string>.NotFound($"Employee with Id {createAttendanceRecordDto.EmployeeId} does not exist.");
+        }
 
         var existingEmployeeRecord = await _attendanceRepository.GetEmployeeAndDateAsync(createAttendanceRecordDto.EmployeeId, createAttendanceRecordDto.AttendanceDate, ct);
 
@@ -37,7 +45,6 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
             AttendanceDate = createAttendanceRecordDto.AttendanceDate,
             ClockInAtUtc = createAttendanceRecordDto.ClockInAtUtc,
             ClockOutAtUtc = createAttendanceRecordDto.ClockOutAtUtc,
-            HoursWorked = createAttendanceRecordDto.HoursWorked,
             Notes = createAttendanceRecordDto.Notes
         };
 
@@ -66,16 +73,6 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
         existingRecord.AttendanceDate = updateAttendanceRecordDto.AttendanceDate;
         existingRecord.ClockInAtUtc = updateAttendanceRecordDto.ClockInAtUtc;
         existingRecord.ClockOutAtUtc = updateAttendanceRecordDto.ClockOutAtUtc;
-
-        if (existingRecord.ClockInAtUtc.HasValue && existingRecord.ClockOutAtUtc.HasValue)
-        {
-            var totalHours = (existingRecord.ClockOutAtUtc.Value - existingRecord.ClockInAtUtc.Value).TotalHours;
-            existingRecord.HoursWorked = Math.Round((decimal)totalHours, 2); // store decimal with 2dp
-        }
-        else
-        {
-            existingRecord.HoursWorked = updateAttendanceRecordDto.HoursWorked; // fallback to DTO value if needed
-        }
         
         existingRecord.Notes = updateAttendanceRecordDto.Notes;
 
@@ -110,8 +107,7 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
             AttendanceDate: employeeRecord.AttendanceDate,
             ClockInAtUtc: employeeRecord.ClockInAtUtc,
             ClockOutAtUtc: employeeRecord.ClockOutAtUtc,
-            HoursWorked:employeeRecord.HoursWorked,
-            CalculatedHoursWorked:employeeRecord.CalculatedHoursWorked,
+            HoursWorked:employeeRecord.CalculatedHoursWorked,
             IsLate:employeeRecord.IsLate,
             Notes:employeeRecord.Notes
         );
@@ -144,7 +140,6 @@ public class AttendanceRecordService(ILogger<AttendanceRecordService> logger, IA
             record.AttendanceDate,
             record.ClockInAtUtc,
             record.ClockOutAtUtc,
-            record.HoursWorked,
             record.CalculatedHoursWorked,
             record.IsLate,
             record.Notes
